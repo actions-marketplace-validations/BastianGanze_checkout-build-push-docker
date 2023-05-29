@@ -4,6 +4,11 @@ inputs:
   image-name:
     description: 'Name of the Docker image, src-folder and tag'
     required: true
+
+branding:
+  icon: 'package'
+  color: 'blue'
+    
 runs:
   using: 'composite'
   steps:
