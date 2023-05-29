@@ -1,0 +1,28 @@
+name: 'Checkout Build Tag Push Docker'
+description: 'Builds, Tags and pushes Docker images to custom repository. image-name has to be the same as the folder where the DOCKERFILE in the repository is in and it will be the same as the tag.'
+inputs:
+  image-name:
+    description: 'Name of the Docker image, src-folder and tag'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: docker build -t ${{ inputs.image-name }} -f ${{ inputs.image-name }}/Dockerfile ./${{ inputs.image-name }}
+      shell: bash
+
+    - name: Log in to Docker registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ env.DOCKER_REGISTRY_USERNAME }}
+        password: ${{ env.DOCKER_REGISTRY_PASSWORD }}
+
+    - name: Push Docker image to registry
+      run: |
+        docker tag ${{ inputs.image-name }}:latest ${{ env.DOCKER_REGISTRY }}/${{ inputs.image-name }}:latest
+        docker push ${{ env.DOCKER_REGISTRY }}/${{ inputs.image-name }}:latest
+      shell: bash
